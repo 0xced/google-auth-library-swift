@@ -18,21 +18,18 @@ import OAuth2
 
 let scopes = ["https://www.googleapis.com/auth/cloud-platform"]
 
-if let provider = DefaultTokenProvider(scopes: scopes) {
-  let sem = DispatchSemaphore(value: 0)
-  try provider.withToken() {(token, error) -> Void in
-    if let token = token {
-      let encoder = JSONEncoder()
-      if let token = try? encoder.encode(token) {
-        print("\(String(data:token, encoding:.utf8)!)")
-      }
-    }
-    if let error = error {
-      print("ERROR \(error)")
+let provider = DefaultTokenProvider(scopes: scopes)
+let sem = DispatchSemaphore(value: 0)
+try provider.withToken { result in
+    switch result {
+    case .success(let token):
+        let encoder = JSONEncoder()
+        if let token = try? encoder.encode(token) {
+          print("\(String(data:token, encoding:.utf8)!)")
+        }
+    case .failure(let error):
+        print("ERROR \(error)")
     }
     sem.signal()
-  }
-  _ = sem.wait(timeout: DispatchTime.distantFuture)
-} else {
-  print("Unable to obtain an auth token.\nTry pointing GOOGLE_APPLICATION_CREDENTIALS to your service account credentials.")
 }
+_ = sem.wait(timeout: DispatchTime.distantFuture)

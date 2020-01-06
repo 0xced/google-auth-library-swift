@@ -35,10 +35,14 @@ struct Credentials: Codable {
   }
 }
 
+enum BrowserTokenProviderError: Error {
+    case notSignedIn
+}
+
 public class BrowserTokenProvider: TokenProvider {
   private var credentials: Credentials
   private var code: Code?
-  public var token: Token?
+  public var tokenResult: Result<Token, Error> = .failure(BrowserTokenProviderError.notSignedIn)
 
   private var sem: DispatchSemaphore?
 
@@ -61,24 +65,17 @@ public class BrowserTokenProvider: TokenProvider {
     self.credentials = credentials
 
     if tokenfile != "" {
-      do {
+      self.tokenResult = Result(catching: {
         let data = try Data(contentsOf: URL(fileURLWithPath: tokenfile))
         let decoder = JSONDecoder()
-        guard let token = try? decoder.decode(Token.self, from: data)
-        else {
-          return nil
-        }
-        self.token = token
-      } catch {
-        // ignore errors due to missing token files
-      }
+        return try decoder.decode(Token.self, from: data)
+      })
     }
   }
 
   public func saveToken(_ filename: String) throws {
-    if let token = token {
-      try token.save(filename)
-    }
+    let token = try tokenResult.get()
+    try token.save(filename)
   }
 
   // StartServer starts a web server that listens on http://localhost:8080.
@@ -175,10 +172,10 @@ public class BrowserTokenProvider: TokenProvider {
     ]
     openURL(urlComponents.url!)
     _ = sem.wait(timeout: DispatchTime.distantFuture)
-    token = try exchange()
+    tokenResult = Result(catching: { try exchange() })
   }
 
-  public func withToken(_ callback: @escaping (Token?, Error?) -> Void) throws {
-    callback(token, nil)
+  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) throws {
+    callback(tokenResult)
   }
 }

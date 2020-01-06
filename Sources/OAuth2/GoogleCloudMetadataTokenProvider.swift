@@ -19,21 +19,10 @@ import Foundation
 #endif
 
 public class GoogleCloudMetadataTokenProvider : TokenProvider {
-  public func withToken(_ callback: @escaping (Token?, Error?) -> Void) throws {
-    callback(token, nil)
-  }
   
   public var token: Token?
   
-  public init?() {
-    refresh()
-    if token == nil {
-      return nil
-    }
-  }
-  
-  public func refresh() {
-    let sem = DispatchSemaphore(value: 0)
+  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) throws {
     let urlString = "http://metadata/computeMetadata/v1/instance/service-accounts/default/token"
     let urlComponents = URLComponents(string:urlString)!
     var request = URLRequest(url: urlComponents.url!)
@@ -42,13 +31,17 @@ public class GoogleCloudMetadataTokenProvider : TokenProvider {
     let session = URLSession(configuration: URLSessionConfiguration.default)
     let task: URLSessionDataTask = session.dataTask(with:request) {
       (data, response, error) -> Void in
-      if let data = data {
-        let decoder = JSONDecoder()
-        self.token = try? decoder.decode(Token.self, from: data)
-      }
-      sem.signal()
+      callback(Result(catching: {
+        if let data = data {
+          let decoder = JSONDecoder()
+          let token = try decoder.decode(Token.self, from: data)
+          self.token = token
+          return token
+        } else {
+          throw error!
+        }
+      }))
     }
     task.resume()
-    _ = sem.wait(timeout: DispatchTime.distantFuture)
   }
 }

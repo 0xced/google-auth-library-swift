@@ -72,7 +72,7 @@ public class ServiceAccountTokenProvider : TokenProvider {
     self.init(credentialsData:credentialsData, scopes:scopes)
   }
   
-  public func withToken(_ callback:@escaping (Token?, Error?) -> Void) throws {
+  public func withToken(_ callback:@escaping (Result<Token, Error>) -> Void) throws {
     let iat = Date()
     let exp = iat.addingTimeInterval(3600)
     let jwtClaimSet = JWTClaimSet(Issuer:credentials.ClientEmail,
@@ -97,13 +97,14 @@ public class ServiceAccountTokenProvider : TokenProvider {
     let session = URLSession(configuration: URLSessionConfiguration.default)
     let task: URLSessionDataTask = session.dataTask(with:urlRequest)
     {(data, response, error) -> Void in
-      let decoder = JSONDecoder()
-      if let data = data,
-        let token = try? decoder.decode(Token.self, from: data) {
-        callback(token, error)
-      } else {
-        callback(nil, error)
-      }
+      callback(Result(catching: {
+        if let data = data {
+          let decoder = JSONDecoder()
+          return try decoder.decode(Token.self, from: data)
+        } else {
+          throw error!
+        }
+      }))
     }
     task.resume()
   }

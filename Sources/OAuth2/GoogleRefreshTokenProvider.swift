@@ -45,41 +45,31 @@ public class GoogleRefreshTokenProvider: TokenProvider {
         return nil
     }
     self.credentials = credentials
-    do {
-      self.token = try exchange()
-      if self.token == nil {
-        return nil
-      }
-    } catch {
-      return nil
-    }
   }
 
-  private func exchange() throws -> Token? {
+  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) throws {
     let parameters = [
       "client_id": credentials.clientID,
       "client_secret": credentials.clientSecret,
       "grant_type": "refresh_token",
       "refresh_token": credentials.refreshToken]
-    var responseData: Data?
-    let sem = DispatchSemaphore(value: 0)
     Connection.performRequest(
       method: "POST",
       urlString: accessTokenPath,
       parameters: parameters,
       body: nil,
-      authorization: "") { data, response, _ in
-        responseData = data
-        sem.signal()
+      authorization: "") { data, response, error in
+        callback(Result(catching: {
+          if let data = data {
+            // assume content type is "application/json"
+            let decoder = JSONDecoder()
+            let token = try decoder.decode(Token.self, from: data)
+            self.token = token
+            return token
+          } else {
+            throw error!
+          }
+      }))
     }
-    _ = sem.wait(timeout: DispatchTime.distantFuture)
-    // assume content type is "application/json"
-    let decoder = JSONDecoder()
-    let token = try? decoder.decode(Token.self, from: responseData!)
-    return token
-  }
-
-  public func withToken(_ callback: @escaping (Token?, Error?) -> Void) throws {
-    callback(token, nil)
   }
 }
