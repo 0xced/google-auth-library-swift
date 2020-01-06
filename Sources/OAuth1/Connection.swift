@@ -112,9 +112,9 @@ public class Connection {
     method : String,
     urlString : String,
     parameters : [String:String],
-    callback: @escaping (Data?, URLResponse?, Error?)->()) throws {
+    callback: @escaping (Data?, URLResponse?, Error?)->()) {
     
-    try provider.withToken() {(token, consumerKey, consumerSecret, err) in
+    provider.withToken() {(token, consumerKey, consumerSecret, err) in
       guard let token = token else {
         return
       }
@@ -138,9 +138,9 @@ public class Connection {
   public func performRequest(
     method : String,
     urlString : String,
-    callback: @escaping (Data?, URLResponse?, Error?)->()) throws {
+    callback: @escaping (Data?, URLResponse?, Error?)->()) {
     let parameters : [String:String] = [:]
-    try self.performRequest(method:method, urlString:urlString, parameters:parameters, callback:callback)
+    self.performRequest(method:method, urlString:urlString, parameters:parameters, callback:callback)
   }
   
 }

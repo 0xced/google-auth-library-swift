@@ -39,7 +39,7 @@ func main() throws {
   }
   
   if arguments[1] == "me" {
-    try github.getMe()
+    github.getMe()
   }
 }
 

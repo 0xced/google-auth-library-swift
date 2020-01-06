@@ -24,10 +24,10 @@ class GitHubSession {
     connection = Connection(provider:tokenProvider)
   }
   
-  func getMe() throws {
+  func getMe() {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://api.github.com/user") {(data, response, error) in
         responseData = data

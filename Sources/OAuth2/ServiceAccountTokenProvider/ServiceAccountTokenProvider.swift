@@ -72,7 +72,7 @@ public class ServiceAccountTokenProvider : TokenProvider {
     self.init(credentialsData:credentialsData, scopes:scopes)
   }
   
-  public func withToken(_ callback:@escaping (Result<Token, Error>) -> Void) throws {
+  public func withToken(_ callback:@escaping (Result<Token, Error>) -> Void) {
     let iat = Date()
     let exp = iat.addingTimeInterval(3600)
     let jwtClaimSet = JWTClaimSet(Issuer:credentials.ClientEmail,
@@ -82,30 +82,34 @@ public class ServiceAccountTokenProvider : TokenProvider {
                                   Expiration: Int(exp.timeIntervalSince1970))
     let jwtHeader = JWTHeader(Algorithm: "RS256",
                               Format: "JWT")
-    let msg = try JWT.encodeWithRS256(jwtHeader:jwtHeader,
-                                      jwtClaimSet:jwtClaimSet,
-                                      rsaKey:rsaKey)
-    let json: [String: Any] = ["grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-                           "assertion": msg]
-    let data = try? JSONSerialization.data(withJSONObject: json)    
-  
-    var urlRequest = URLRequest(url:URL(string:credentials.TokenURI)!)
-    urlRequest.httpMethod = "POST"
-    urlRequest.httpBody = data
-    urlRequest.setValue("application/json", forHTTPHeaderField:"Content-Type")
-    
-    let session = URLSession(configuration: URLSessionConfiguration.default)
-    let task: URLSessionDataTask = session.dataTask(with:urlRequest)
-    {(data, response, error) -> Void in
-      callback(Result(catching: {
-        if let data = data {
-          let decoder = JSONDecoder()
-          return try decoder.decode(Token.self, from: data)
-        } else {
-          throw error!
-        }
-      }))
+    do {
+      let msg = try JWT.encodeWithRS256(jwtHeader:jwtHeader,
+                                        jwtClaimSet:jwtClaimSet,
+                                        rsaKey:rsaKey)
+      let json: [String: Any] = ["grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                                 "assertion": msg]
+      let data = try JSONSerialization.data(withJSONObject: json)
+      
+      var urlRequest = URLRequest(url:URL(string:credentials.TokenURI)!)
+      urlRequest.httpMethod = "POST"
+      urlRequest.httpBody = data
+      urlRequest.setValue("application/json", forHTTPHeaderField:"Content-Type")
+      
+      let session = URLSession(configuration: URLSessionConfiguration.default)
+      let task: URLSessionDataTask = session.dataTask(with:urlRequest)
+      {(data, response, error) -> Void in
+        callback(Result(catching: {
+          if let data = data {
+            let decoder = JSONDecoder()
+            return try decoder.decode(Token.self, from: data)
+          } else {
+            throw error!
+          }
+        }))
+      }
+      task.resume()
+    } catch let error {
+      callback(.failure(error))
     }
-    task.resume()
   }
 }

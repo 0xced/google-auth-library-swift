@@ -175,7 +175,7 @@ public class BrowserTokenProvider: TokenProvider {
     tokenResult = Result(catching: { try exchange() })
   }
 
-  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) throws {
+  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) {
     callback(tokenResult)
   }
 }

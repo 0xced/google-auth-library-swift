@@ -23,10 +23,10 @@ class TwitterSession {
     connection = Connection(provider:tokenProvider)
   }
   
-  func getTweets() throws {
+  func getTweets() {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://api.twitter.com/1.1/statuses/user_timeline.json") {(data, response, error) in
         responseData = data

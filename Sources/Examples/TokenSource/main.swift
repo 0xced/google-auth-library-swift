@@ -20,7 +20,7 @@ let scopes = ["https://www.googleapis.com/auth/cloud-platform"]
 
 let provider = DefaultTokenProvider(scopes: scopes)
 let sem = DispatchSemaphore(value: 0)
-try provider.withToken { result in
+provider.withToken { result in
     switch result {
     case .success(let token):
         let encoder = JSONEncoder()

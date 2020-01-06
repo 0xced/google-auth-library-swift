@@ -24,10 +24,10 @@ class MeetupSession {
     connection = Connection(provider:tokenProvider)
   }
   
-  func getMe() throws {
+  func getMe() {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://api.meetup.com/dashboard") {(data, response, error) in
         responseData = data
@@ -40,10 +40,10 @@ class MeetupSession {
     }
   }
   
-  func getRSVPs(eventid : String) throws {
+  func getRSVPs(eventid : String) {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://api.meetup.com/sviphone/events/\(eventid)/rsvps") {(data, response, error) in
         responseData = data
@@ -56,11 +56,11 @@ class MeetupSession {
     }
   }
   
-  func getEvents() throws {
+  func getEvents() {
     let sem = DispatchSemaphore(value: 0)
     let parameters : [String:String] = ["status":"past"]
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://api.meetup.com/sviphone/events",
       parameters: parameters,

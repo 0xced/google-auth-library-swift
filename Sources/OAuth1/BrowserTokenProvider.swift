@@ -158,13 +158,13 @@ public class BrowserTokenProvider: TokenProvider {
       urlComponents.queryItems = [URLQueryItem(name: "oauth_token", value: encode(token!.oAuthToken!))]
       openURL(urlComponents.url!)
       _ = sem.wait(timeout: DispatchTime.distantFuture)
-      try exchange()
+      exchange()
     } else {
       throw AuthError.tokenRequestFailed
     }
   }
 
-  private func exchange() throws {
+  private func exchange() {
     let sem = DispatchSemaphore(value: 0)
     let parameters = [
       "oauth_token": token!.oAuthToken!,
@@ -187,7 +187,7 @@ public class BrowserTokenProvider: TokenProvider {
     token = Token(urlComponents: urlComponents)
   }
 
-  public func withToken(_ callback: @escaping (Token?, String?, String?, Error?) -> Void) throws {
+  public func withToken(_ callback: @escaping (Token?, String?, String?, Error?) -> Void) {
     callback(token, credentials.consumerKey, credentials.consumerSecret, nil)
   }
 }

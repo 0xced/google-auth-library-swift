@@ -23,12 +23,12 @@ class GoogleSession {
     connection = Connection(provider:tokenProvider)
   }
   
-  func getMe() throws {
+  func getMe() {
     let sem = DispatchSemaphore(value: 0)
     
     let parameters = ["requestMask.includeField": "person.names,person.photos"]
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://people.googleapis.com/v1/people/me",
       parameters: parameters,
@@ -43,11 +43,11 @@ class GoogleSession {
     }
   }
   
-  func getPeople() throws {
+  func getPeople() {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
     let parameters = ["requestMask.includeField": "person.names,person.photos"]
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://people.googleapis.com/v1/people/me/connections",
       parameters: parameters,
@@ -62,13 +62,13 @@ class GoogleSession {
     }
   }
   
-  func getData() throws {
+  func getData() {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
     let parameters : [String:String] = [:]
     let postJSON = ["gqlQuery":["queryString":"select *"]]
-    let postData = try JSONSerialization.data(withJSONObject:postJSON)
-    try connection.performRequest(
+    let postData = try! JSONSerialization.data(withJSONObject:postJSON)
+    connection.performRequest(
       method:"POST",
       urlString:"https://datastore.googleapis.com/v1/projects/hello-86:runQuery",
       parameters: parameters,
@@ -90,13 +90,13 @@ class GoogleSession {
     //let result = try service.runquery(request)
   }
   
-  func translate(_ input:String) throws {
+  func translate(_ input:String) {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
     let parameters : [String:String] = [:]
     let postJSON = ["q":input, "provider":"en", "target":"es", "format":"text"]
-    let postData = try JSONSerialization.data(withJSONObject:postJSON)
-    try connection.performRequest(
+    let postData = try! JSONSerialization.data(withJSONObject:postJSON)
+    connection.performRequest(
       method:"POST",
       urlString:"https://translation.googleapis.com/language/translate/v2",
       parameters: parameters,

@@ -24,10 +24,10 @@ class SpotifySession {
     connection = Connection(provider:tokenProvider)
   }
   
-  func getUser() throws {
+  func getUser() {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://api.spotify.com/v1/me") {(data, response, error) in
         responseData = data
@@ -40,10 +40,10 @@ class SpotifySession {
     }
   }
   
-  func getTracks() throws {
+  func getTracks() {
     let sem = DispatchSemaphore(value: 0)
     var responseData : Data?
-    try connection.performRequest(
+    connection.performRequest(
       method:"GET",
       urlString:"https://api.spotify.com/v1/me/tracks") {(data, response, error) in
         responseData = data

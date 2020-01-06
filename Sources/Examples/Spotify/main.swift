@@ -45,11 +45,11 @@ func main() throws {
   }
   
   if arguments[1] == "me" {
-    try spotify.getUser()
+    spotify.getUser()
   }
   
   if arguments[1] == "tracks" {
-    try spotify.getTracks()
+    spotify.getTracks()
   }
 }
 

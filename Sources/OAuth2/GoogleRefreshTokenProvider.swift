@@ -47,7 +47,7 @@ public class GoogleRefreshTokenProvider: TokenProvider {
     self.credentials = credentials
   }
 
-  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) throws {
+  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) {
     let parameters = [
       "client_id": credentials.clientID,
       "client_secret": credentials.clientSecret,

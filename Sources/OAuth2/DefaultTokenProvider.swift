@@ -57,8 +57,8 @@ https://cloud.google.com/docs/authentication/.
     tokenProvider = GoogleCloudMetadataTokenProvider()
   }
   
-  public func withToken(_ callback:@escaping (Result<Token, Error>) -> Void) throws {
-    try tokenProvider.withToken() { result in
+  public func withToken(_ callback:@escaping (Result<Token, Error>) -> Void) {
+    tokenProvider.withToken() { result in
       self.token = try? result.get()
       callback(result)
     }

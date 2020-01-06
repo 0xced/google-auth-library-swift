@@ -84,13 +84,13 @@ func main() throws {
         try browserTokenProvider.signIn(scopes:scopes)
         try browserTokenProvider.saveToken(TOKEN)
     case .me:
-        try google.getMe()
+        google.getMe()
     case .people:
-        try google.getPeople()
+        google.getPeople()
     case .data:
-        try google.getData()
+        google.getData()
     case .translate(let text):
-        try google.translate(text)
+        google.translate(text)
     }
 
 }

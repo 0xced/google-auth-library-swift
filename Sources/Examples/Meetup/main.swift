@@ -39,15 +39,15 @@ func main() throws {
   }
   
   if arguments[1] == "me" {
-    try meetup.getMe()
+    meetup.getMe()
   }
   
   if arguments[1] == "rsvps" {
-    try meetup.getRSVPs(eventid:arguments[2])
+    meetup.getRSVPs(eventid:arguments[2])
   }
   
   if arguments[1] == "events" {
-    try meetup.getEvents()
+    meetup.getEvents()
   }
 }
 

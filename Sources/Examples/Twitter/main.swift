@@ -39,7 +39,7 @@ func main() throws {
   }
   
   if arguments[1] == "tweets" {
-    try twitter.getTweets()
+    twitter.getTweets()
   }
 }
 

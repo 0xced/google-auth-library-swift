@@ -22,7 +22,7 @@ public class GoogleCloudMetadataTokenProvider : TokenProvider {
   
   public var token: Token?
   
-  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) throws {
+  public func withToken(_ callback: @escaping (Result<Token, Error>) -> Void) {
     let urlString = "http://metadata/computeMetadata/v1/instance/service-accounts/default/token"
     let urlComponents = URLComponents(string:urlString)!
     var request = URLRequest(url: urlComponents.url!)
