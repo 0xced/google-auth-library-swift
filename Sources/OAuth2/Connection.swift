@@ -81,7 +81,7 @@ public class Connection {
           urlString: urlString,
           parameters: parameters,
           body: body,
-          authorization: "Bearer " + (token.AccessToken ?? ""),
+          authorization: "Bearer " + token.AccessToken,
           callback: callback)
       } catch let tokenError {
         callback(nil, nil, tokenError)

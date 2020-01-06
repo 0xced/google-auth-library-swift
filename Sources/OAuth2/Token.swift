@@ -14,12 +14,12 @@
 import Foundation
 
 public struct Token : Codable {
-  public var AccessToken : String?
-  public var TokenType : String?
+  public var AccessToken : String
+  public var TokenType : String
   public var ExpiresIn : Int?
   public var RefreshToken : String?
   public var Scope : String?
-  public var CreationTime : Date?
+  public var CreationTime : Date? = Date()
   enum CodingKeys: String, CodingKey {
     case AccessToken = "access_token"
     case TokenType = "token_type"
@@ -35,29 +35,25 @@ public struct Token : Codable {
     try data.write(to: URL(fileURLWithPath: filename))
   }
   
-  public init(accessToken: String) {
+  public init(accessToken: String, tokenType: String, expiresIn: Int?, refreshToken: String?, scope: String?) {
     self.AccessToken = accessToken
+    self.TokenType = tokenType
+    self.ExpiresIn = expiresIn
+    self.RefreshToken = refreshToken
+    self.Scope = scope
   }
   
-  public init(urlComponents: URLComponents) {
-    CreationTime = Date()
-    for queryItem in urlComponents.queryItems! {
-      if let value = queryItem.value {
-        switch queryItem.name {
-        case "access_token":
-          AccessToken = value
-        case "token_type":
-          TokenType = value
-        case "expires_in":
-          ExpiresIn = Int(value)
-        case "refresh_token":
-          RefreshToken = value
-        case "scope":
-          Scope = value
-        default:
-          break
-        }
-      }
+  public init(queryItems: [URLQueryItem]) throws {
+    guard let accessToken = queryItems.filter({ $0.name == CodingKeys.AccessToken.rawValue }).first?.value else {
+      throw AuthError.unknownError
     }
+    guard let tokenType = queryItems.filter({ $0.name == CodingKeys.TokenType.rawValue }).first?.value else {
+      throw AuthError.unknownError
+    }
+    let expiresInString = queryItems.filter({ $0.name == CodingKeys.ExpiresIn.rawValue }).first?.value
+    let expiresIn = expiresInString != nil ? Int(expiresInString!) : nil
+    let refreshToken = queryItems.filter({ $0.name == CodingKeys.RefreshToken.rawValue }).first?.value
+    let scope = queryItems.filter({ $0.name == CodingKeys.Scope.rawValue }).first?.value
+    self.init(accessToken: accessToken, tokenType: tokenType, expiresIn: expiresIn, refreshToken: refreshToken, scope: scope)
   }
 }

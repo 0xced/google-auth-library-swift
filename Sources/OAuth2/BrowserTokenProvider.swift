@@ -146,10 +146,10 @@ public class BrowserTokenProvider: TokenProvider {
       guard let queryParameters = String(data: responseData, encoding: .utf8) else {
         throw AuthError.unknownError
       }
-      guard let urlComponents = URLComponents(string: "http://example.com?" + queryParameters) else {
+      guard let queryItems = URLComponents(string: "http://example.com?" + queryParameters)?.queryItems else {
         throw AuthError.unknownError
       }
-      return Token(urlComponents: urlComponents)
+      return try Token(queryItems: queryItems)
     }
   }
 
