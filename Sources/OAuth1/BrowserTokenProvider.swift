@@ -125,6 +125,7 @@ public class BrowserTokenProvider: TokenProvider {
     var error: Error?
 
     Connection.performRequest(
+      session: URLSession.shared,
       method: "POST",
       urlString: credentials.requestTokenURL,
       parameters: parameters,
@@ -172,6 +173,7 @@ public class BrowserTokenProvider: TokenProvider {
     ]
     var responseData: Data?
     Connection.performRequest(
+      session: URLSession.shared,
       method: "POST",
       urlString: credentials.accessTokenURL,
       parameters: parameters,

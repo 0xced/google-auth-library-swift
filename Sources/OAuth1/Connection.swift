@@ -22,9 +22,11 @@ import CryptoSwift
 public class Connection {
   
   public var provider : TokenProvider
+  public var session : URLSession
   
-  public init(provider : TokenProvider) {
+  public init(provider : TokenProvider, session: URLSession = URLSession.shared) {
     self.provider = provider
+    self.session = session
   }
   
   class func signOAuthRequest(
@@ -53,6 +55,7 @@ public class Connection {
   }
   
   public class func performRequest(
+    session: URLSession,
     method : String,
     urlString : String,
     parameters : [String:String],
@@ -101,7 +104,6 @@ public class Connection {
     request.setValue(authorization, forHTTPHeaderField:"Authorization")
     request.httpMethod = method
     
-    let session = URLSession(configuration: URLSessionConfiguration.default)
     let task: URLSessionDataTask = session.dataTask(with:request) { (data, response, error) -> Void in
       callback(data, response, error)
     }
@@ -125,6 +127,7 @@ public class Connection {
       var parameters = parameters
       parameters["oauth_token"] = oAuthToken
       Connection.performRequest(
+        session: self.session,
         method: method,
         urlString: urlString,
         parameters: parameters,

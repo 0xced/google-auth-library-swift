@@ -54,6 +54,7 @@ public class GoogleRefreshTokenProvider: TokenProvider {
       "grant_type": "refresh_token",
       "refresh_token": credentials.refreshToken]
     Connection.performRequest(
+      session: URLSession.shared,
       method: "POST",
       urlString: accessTokenPath,
       parameters: parameters,
