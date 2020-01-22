@@ -116,6 +116,7 @@ public class BrowserTokenProvider: TokenProvider {
     var responseData: Data?
     var contentType: String?
     Connection.performRequest(
+      session: URLSession.shared,
       method: "POST",
       urlString: credentials.accessTokenURL,
       parameters: parameters,
